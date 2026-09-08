@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="ja" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>メトロニダゾールゲル0.75%「マルイシ」 投与量計算ツール（社外秘）</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+JP:wght@400;500;700;900&display=swap');
+    body {
+      font-family: 'Noto Sans JP', 'Inter', sans-serif;
+    }
+    :root {
+      --brand-pink: #f43f5e;
+      --brand-pink-dark: #e11d48;
+      --brand-pink-darker: #be123c;
+      --brand-pink-light: #881337;
+    }
+    /* Dynamic Dark Input Styles */
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col antialiased selection:bg-rose-500 selection:text-white">
+
+  <!-- Header (Top Ribbon Removed) -->
+  <header class="bg-slate-900/95 backdrop-blur-md text-slate-100 shadow-xl border-b border-slate-800 sticky top-0 z-30">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex flex-wrap justify-between items-center gap-4">
+      <div class="flex items-start md:items-center space-x-3.5">
+        <div class="p-3 bg-gradient-to-br from-rose-500 to-rose-700 rounded-xl text-white font-bold flex items-center justify-center shadow-lg shadow-rose-950/60 border border-rose-400/40 shrink-0 mt-1 md:mt-0">
+          <i data-lucide="calculator" class="w-7 h-7"></i>
+        </div>
+        <div>
+          <!-- Badges for Confidentiality and Storage -->
+          <div class="flex flex-wrap items-center gap-2.5 mb-2">
+            <!-- "社内資料" Badge (Updated from 社外秘) -->
+            <span class="text-xs md:text-sm font-black uppercase tracking-wider text-amber-200 bg-amber-950 border-2 border-amber-500 px-3 py-1 rounded-lg flex items-center gap-1.5 shadow-md">
+              <i data-lucide="file-text" class="w-4 h-4 text-amber-400"></i> 社内資料
+            </span>
+            <!-- Extremely Bold Static "CONFIDENTIAL" Stamp Badge -->
+            <span class="text-xs md:text-sm font-black uppercase tracking-widest text-white bg-rose-700 border-2 border-rose-300 px-3.5 py-1 rounded-lg flex items-center gap-2 shadow-lg">
+              <i data-lucide="lock" class="w-4 h-4 text-white"></i> CONFIDENTIAL (社外秘)
+            </span>
+            <!-- Storage Condition Badge -->
+            <span class="text-xs font-bold text-slate-300 bg-slate-800 border border-slate-700 px-2.5 py-1 rounded-lg flex items-center gap-1">
+              <i data-lucide="snowflake" class="w-3.5 h-3.5 text-cyan-400"></i> 凍結厳禁（室温保存）
+            </span>
+          </div>
+          <h1 class="text-lg md:text-2xl font-black tracking-tight text-white">
+            メトロニダゾールゲル 0.75%「マルイシ」 投与量計算ツール
+          </h1>
+        </div>
+      </div>
+      <div class="text-xs md:text-sm text-slate-300 text-right bg-slate-950 px-3.5 py-2 rounded-xl border border-slate-800 shadow-inner shrink-0">
+        丸石製薬規格（50g / 100g）対応<br>
+        <span class="text-rose-400 font-extrabold">薬価: 33.0円/g（先発: 62.0円/g）</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-6xl mx-auto px-4 py-6 flex-1 w-full grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+    <!-- Left Column: Input Form (lg:col-span-7) -->
+    <section class="lg:col-span-7 space-y-6">
+      
+      <!-- Cancerous Ulcer Section -->
+      <div id="sectionUlcer" class="bg-slate-900/90 rounded-2xl shadow-xl border border-slate-800/80 p-5 md:p-6 space-y-6 backdrop-blur">
+        
+        <div class="border-b border-slate-800 pb-3 flex justify-between items-center">
+          <h2 class="text-base font-bold text-white flex items-center gap-2">
+            <i data-lucide="ruler" class="w-5 h-5 text-rose-500"></i>
+            1. 潰瘍（病巣）サイズの入力
+          </h2>
+          <span class="text-xs text-rose-300 bg-rose-950/50 border border-rose-900/80 px-2.5 py-1 rounded-full">基準: 200cm² = 10g (0.05g/cm²)</span>
+        </div>
+
+        <!-- Input Mode Selector -->
+        <div class="grid grid-cols-3 gap-2">
+          <label class="cursor-pointer border border-slate-800 bg-slate-950/60 rounded-xl p-2.5 text-center transition-all flex flex-col items-center gap-1 hover:border-rose-500/50" id="modeLabelRect">
+            <input type="radio" name="calcMode" value="rect" checked onchange="updateCalcMode()" class="hidden">
+            <i data-lucide="square" class="w-5 h-5 text-slate-400"></i>
+            <span class="text-xs font-medium text-slate-300">長方形 / 矩形</span>
+          </label>
+          <label class="cursor-pointer border border-slate-800 bg-slate-950/60 rounded-xl p-2.5 text-center transition-all flex flex-col items-center gap-1 hover:border-rose-500/50" id="modeLabelEllipse">
+            <input type="radio" name="calcMode" value="ellipse" onchange="updateCalcMode()" class="hidden">
+            <i data-lucide="circle" class="w-5 h-5 text-slate-400"></i>
+            <span class="text-xs font-medium text-slate-300">楕円 / 円形</span>
+          </label>
+          <label class="cursor-pointer border border-slate-800 bg-slate-950/60 rounded-xl p-2.5 text-center transition-all flex flex-col items-center gap-1 hover:border-rose-500/50" id="modeLabelArea">
+            <input type="radio" name="calcMode" value="area" onchange="updateCalcMode()" class="hidden">
+            <i data-lucide="edit-3" class="w-5 h-5 text-slate-400"></i>
+            <span class="text-xs font-medium text-slate-300">直接面積入力</span>
+          </label>
+        </div>
+
+        <!-- Dimension Inputs -->
+        <div id="dimensionInputs" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 mb-1">長径 (cm)</label>
+            <div class="relative">
+              <input type="number" id="inputLength" value="10" min="0.5" max="50" step="0.5" oninput="calculate()" class="w-full bg-slate-950 border border-slate-700/80 rounded-lg px-3 py-2 text-white font-semibold focus:outline-none focus:border-rose-500 focus:ring-1 focus:ring-rose-500 text-sm transition">
+              <span class="absolute right-3 top-2.5 text-xs text-slate-500">cm</span>
+            </div>
+          </div>
+          <div id="widthContainer">
+            <label class="block text-xs font-semibold text-slate-400 mb-1">短径 (cm)</label>
+            <div class="relative">
+              <input type="number" id="inputWidth" value="10" min="0.5" max="50" step="0.5" oninput="calculate()" class="w-full bg-slate-950 border border-slate-700/80 rounded-lg px-3 py-2 text-white font-semibold focus:outline-none focus:border-rose-500 focus:ring-1 focus:ring-rose-500 text-sm transition">
+              <span class="absolute right-3 top-2.5 text-xs text-slate-500">cm</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Direct Area Input (Hidden by default) -->
+        <div id="areaContainer" class="hidden">
+          <label class="block text-xs font-semibold text-slate-400 mb-1">潰瘍面積 (cm²)</label>
+          <div class="relative">
+            <input type="number" id="inputAreaDirect" value="100" min="1" max="2500" step="1" oninput="calculate()" class="w-full bg-slate-950 border border-slate-700/80 rounded-lg px-3 py-2 text-white font-semibold focus:outline-none focus:border-rose-500 focus:ring-1 focus:ring-rose-500 text-sm transition">
+            <span class="absolute right-3 top-2.5 text-xs text-slate-500">cm²</span>
+          </div>
+        </div>
+
+        <!-- Canvas Preview & Preset Badges -->
+        <div class="space-y-2">
+          <div class="flex justify-between items-center text-xs text-slate-400">
+            <span>計算面積: <strong id="calcAreaDisplay" class="text-rose-400 font-bold">100</strong> cm²</span>
+            <span>代表的サイズクイック選択:</span>
+          </div>
+          <div class="flex flex-wrap gap-1.5">
+            <button type="button" onclick="setPresetSize(5, 5)" class="px-2.5 py-1 text-xs bg-slate-800 hover:bg-rose-950 hover:text-rose-300 hover:border-rose-800 text-slate-300 rounded-lg transition border border-slate-700">5×5cm (25cm²)</button>
+            <button type="button" onclick="setPresetSize(10, 10)" class="px-2.5 py-1 text-xs bg-slate-800 hover:bg-rose-950 hover:text-rose-300 hover:border-rose-800 text-slate-300 rounded-lg transition border border-slate-700">10×10cm (100cm²)</button>
+            <button type="button" onclick="setPresetSize(15, 10)" class="px-2.5 py-1 text-xs bg-slate-800 hover:bg-rose-950 hover:text-rose-300 hover:border-rose-800 text-slate-300 rounded-lg transition border border-slate-700">15×10cm (150cm²)</button>
+            <button type="button" onclick="setPresetSize(15, 15)" class="px-2.5 py-1 text-xs bg-slate-800 hover:bg-rose-950 hover:text-rose-300 hover:border-rose-800 text-slate-300 rounded-lg transition border border-slate-700">15×15cm (225cm²)</button>
+          </div>
+          
+          <!-- Visual Canvas for Area Preview -->
+          <div class="bg-slate-950/80 rounded-xl p-3 flex flex-col items-center justify-center border border-slate-800 h-36 relative overflow-hidden">
+            <span class="absolute top-2 left-2 text-[10px] text-slate-400 bg-slate-900/90 px-2 py-0.5 rounded-full border border-slate-800 shadow-sm">病巣サイズ比率イメージ</span>
+            <canvas id="ulcerCanvas" width="280" height="110" class="max-w-full"></canvas>
+          </div>
+        </div>
+
+        <div class="border-b border-slate-800 pt-2 pb-3">
+          <h2 class="text-base font-bold text-white flex items-center gap-2">
+            <i data-lucide="clock" class="w-5 h-5 text-rose-500"></i>
+            2. 投与スケジュール設定
+          </h2>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 mb-1">1日の投与回数</label>
+            <select id="inputFrequency" onchange="calculate()" class="w-full bg-slate-950 border border-slate-700/80 rounded-lg px-3 py-2 text-white font-semibold focus:outline-none focus:border-rose-500 focus:ring-1 focus:ring-rose-500 text-sm transition">
+              <option value="1" class="bg-slate-900 text-white">1日 1回 塗布</option>
+              <option value="2" selected class="bg-slate-900 text-white">1日 2回 塗布 (標準)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 mb-1">処方日数 (日分)</label>
+            <div class="relative">
+              <input type="number" id="inputDays" value="14" min="1" max="90" oninput="calculate()" class="w-full bg-slate-950 border border-slate-700/80 rounded-lg px-3 py-2 text-white font-semibold focus:outline-none focus:border-rose-500 focus:ring-1 focus:ring-rose-500 text-sm transition">
+              <span class="absolute right-3 top-2.5 text-xs text-slate-500 pointer-events-none">日分</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Day Buttons -->
+        <div class="flex gap-2">
+          <button type="button" onclick="setDays(7)" class="flex-1 py-1.5 text-xs bg-slate-800 hover:bg-rose-950 hover:text-rose-300 hover:border-rose-800 text-slate-300 rounded-lg border border-slate-700 transition">7日分 (1週)</button>
+          <button type="button" onclick="setDays(14)" class="flex-1 py-1.5 text-xs bg-slate-800 hover:bg-rose-950 hover:text-rose-300 hover:border-rose-800 text-slate-300 rounded-lg border border-slate-700 transition">14日分 (2週)</button>
+          <button type="button" onclick="setDays(28)" class="flex-1 py-1.5 text-xs bg-slate-800 hover:bg-rose-950 hover:text-rose-300 hover:border-rose-800 text-slate-300 rounded-lg border border-slate-700 transition">28日分 (4週)</button>
+          <button type="button" onclick="setDays(30)" class="flex-1 py-1.5 text-xs bg-slate-800 hover:bg-rose-950 hover:text-rose-300 hover:border-rose-800 text-slate-300 rounded-lg border border-slate-700 transition">30日分 (約1ヶ月)</button>
+        </div>
+
+      </div>
+
+      <!-- Advanced Settings Accordion -->
+      <div class="bg-slate-900/90 rounded-2xl shadow-xl border border-slate-800/80 overflow-hidden backdrop-blur">
+        <button type="button" onclick="toggleAdvanced()" class="w-full px-5 py-3 text-left font-semibold text-xs text-slate-300 flex justify-between items-center hover:bg-slate-800/50 transition">
+          <span class="flex items-center gap-2">
+            <i data-lucide="sliders" class="w-4 h-4 text-rose-500"></i>
+            詳細設定（塗布密度・薬価自己負担割合の設定）
+          </span>
+          <i data-lucide="chevron-down" id="advChevron" class="w-4 h-4 text-slate-500 transition-transform"></i>
+        </button>
+        <div id="advancedPanel" class="p-5 border-t border-slate-800 hidden space-y-4 bg-slate-950/40">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-400 mb-1">塗布密度係数 (g / cm²)</label>
+              <select id="inputDensity" onchange="calculate()" class="w-full bg-slate-950 border border-slate-700/80 rounded-lg px-3 py-2 text-white text-xs font-semibold focus:outline-none focus:border-rose-500 transition">
+                <option value="0.05" selected class="bg-slate-900 text-white">0.05 g/cm²（マルイシ基準）</option>
+                <option value="0.08" class="bg-slate-900 text-white">0.08 g/cm²（ロゼックス基準）</option>
+              </select>
+              <span class="text-[10px] text-slate-500 mt-1 block">※マルイシ基準は200cm²で10g (0.05g/cm²)</span>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-400 mb-1">患者自己負担割合</label>
+              <select id="inputBurden" onchange="calculate()" class="w-full bg-slate-950 border border-slate-700/80 rounded-lg px-3 py-2 text-white text-xs font-semibold focus:outline-none focus:border-rose-500 transition">
+                <option value="0.3" selected class="bg-slate-900 text-white">3割負担 (一般)</option>
+                <option value="0.2" class="bg-slate-900 text-white">2割負担 (前期高齢者等)</option>
+                <option value="0.1" class="bg-slate-900 text-white">1割負担 (後期高齢者等)</option>
+                <option value="1.0" class="bg-slate-900 text-white">10割 (自費・全額負担)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Right Column: Calculation Results (lg:col-span-5) -->
+    <section class="lg:col-span-5 space-y-6">
+
+      <!-- Output Display Card -->
+      <div class="bg-slate-900/90 text-white rounded-2xl p-6 shadow-2xl border border-slate-800 relative overflow-hidden backdrop-blur">
+        
+        <!-- Maruishi Generic Label Badge -->
+        <div class="flex justify-between items-center mb-4">
+          <span class="text-xs font-bold uppercase tracking-wider text-rose-300 bg-rose-950/80 border border-rose-800 px-3 py-1 rounded-full flex items-center gap-1.5 shadow-sm">
+            <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-rose-400"></i>
+            メトロニダゾールゲル「マルイシ」
+          </span>
+          <span class="text-xs font-medium text-slate-400 bg-slate-950 px-2 py-0.5 rounded border border-slate-800">後発品 (33.0円/g)</span>
+        </div>
+
+        <!-- Primary Output Numbers -->
+        <div class="space-y-3">
+          
+          <div class="bg-slate-950/90 rounded-xl p-4 border border-rose-900/40 shadow-inner">
+            <div class="flex justify-between items-center mb-1">
+              <span class="text-xs font-medium text-slate-400">1回塗布量 の目安</span>
+            </div>
+            <div class="flex items-baseline gap-2">
+              <span id="resSingleDose" class="text-4xl font-extrabold text-rose-500 tracking-tight drop-shadow-[0_0_12px_rgba(244,63,94,0.3)]">5.0</span>
+              <span class="text-base text-slate-400 font-semibold">g / 回</span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div class="bg-slate-950/70 rounded-xl p-3 border border-slate-800 shadow-inner">
+              <span class="text-[11px] font-medium text-slate-400 block">1日投与量</span>
+              <div class="text-xl font-bold text-white mt-0.5"><span id="resDailyDose">10.0</span> <span class="text-xs font-normal text-slate-500">g</span></div>
+            </div>
+            <div class="bg-slate-950/70 rounded-xl p-3 border border-slate-800 shadow-inner">
+              <span class="text-[11px] font-medium text-slate-400 block">必要総量 (<span id="resDaysLabel">14</span>日分)</span>
+              <div class="text-xl font-bold text-white mt-0.5"><span id="resTotalDose">140.0</span> <span class="text-xs font-normal text-slate-500">g</span></div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Prescription Recommendation Box (Categorized by 100g and 50g) -->
+        <div class="mt-5 pt-4 border-t border-slate-800 space-y-3">
+          <span class="text-xs font-bold text-slate-300 block uppercase tracking-wider flex items-center gap-1.5">
+            <i data-lucide="package" class="w-4 h-4 text-rose-500"></i>
+            推奨処方本数（規格別）
+          </span>
+
+          <div id="tubeResultContainer" class="space-y-2">
+            <!-- Dynamic tube combinations will be injected here -->
+          </div>
+
+          <!-- Price Estimate -->
+          <div class="bg-slate-950/90 border border-slate-800 rounded-xl p-3.5 space-y-2.5 shadow-sm">
+            <div class="flex justify-between items-center text-xs border-b border-slate-800 pb-2">
+              <span class="font-bold text-slate-200 flex items-center gap-1.5">
+                <i data-lucide="coins" class="w-4 h-4 text-rose-500"></i>
+                薬剤費（自己負担額 <span id="resBurdenRate" class="text-rose-400">3</span>割）比較
+              </span>
+              <span class="text-[10px] text-slate-500">※薬剤本体のみ</span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <div class="bg-slate-900/90 p-2.5 rounded-lg border border-slate-800">
+                <div class="text-[10px] text-slate-400">先発品（ロゼックス）</div>
+                <div class="text-sm font-bold text-slate-200 mt-0.5" id="resPriceBrand">約 0 円</div>
+                <div class="text-[9px] text-slate-500">薬価: 62.0円/g</div>
+              </div>
+              <div class="bg-rose-950/30 p-2.5 rounded-lg border border-rose-900/50">
+                <div class="text-[10px] text-rose-300 font-bold">後発品（マルイシ）</div>
+                <div class="text-sm font-bold text-rose-400 mt-0.5" id="resPriceGeneric">約 0 円</div>
+                <div class="text-[9px] text-rose-400/70">薬価: 33.0円/g</div>
+              </div>
+            </div>
+
+            <!-- Difference Highlight (Updated label to 差額) -->
+            <div class="bg-emerald-950/40 border border-emerald-800/80 rounded-lg p-2.5 flex justify-between items-center">
+              <div class="flex items-center gap-1.5">
+                <i data-lucide="trending-down" class="w-4 h-4 text-emerald-400"></i>
+                <span class="text-xs font-bold text-emerald-300">後発品変更による差額</span>
+              </div>
+              <span class="text-base font-extrabold text-emerald-400" id="resPriceDiff">- 0 円</span>
+            </div>
+          </div>
+          <div class="text-[10px] text-slate-500 text-right">
+            ※上記は薬剤費のみの自己負担概算です。調剤基本料や手技料等は含まれません。
+          </div>
+        </div>
+
+        <!-- Action Button -->
+        <div class="mt-5">
+          <button type="button" onclick="copySummary()" class="w-full py-2.5 px-3 bg-slate-800 hover:bg-slate-700 active:bg-slate-900 text-slate-200 rounded-xl text-xs font-semibold transition flex items-center justify-center gap-1.5 border border-slate-700 shadow-md hover:border-slate-600">
+            <i data-lucide="copy" class="w-4 h-4 text-slate-400"></i>
+            計算結果をコピー
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Clinical Guidelines & Reference Box -->
+      <div class="bg-slate-900/90 rounded-2xl shadow-xl border border-slate-800 p-5 space-y-3 backdrop-blur">
+        <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+          <i data-lucide="info" class="w-4 h-4 text-rose-500"></i>
+          メトロニダゾールゲル0.75%「マルイシ」 使用上の要点
+        </h3>
+        <ul class="text-xs text-slate-400 space-y-1.5 list-disc list-inside leading-relaxed">
+          <li><strong>塗布方法:</strong> 潰瘍面を清潔に拭いた（洗浄後）後、1日1〜2回、ガーゼ等にのばして貼付するか、患部に直接塗布しガーゼ等で保護してください。</li>
+          <li><strong>保管方法:</strong> <strong class="text-rose-400 font-bold">凍結厳禁（室温1〜30℃保存）</strong>。冷蔵庫や低温環境で保管しないでください。</li>
+          <li><strong>出血注意:</strong> ガーゼ交換の際、乾燥・固着による再出血を防ぐため、ぬるま湯や生理食塩水でぬらして軟化させてから剥離してください。</li>
+          <li><strong>効能又は効果：</strong>がん性皮膚潰瘍部位の殺菌・臭気の軽減</li>
+        </ul>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white text-xs px-4 py-3 rounded-lg shadow-2xl border border-slate-700 transform translate-y-20 opacity-0 transition-all duration-300 flex items-center gap-2 z-50">
+    <i data-lucide="check" class="w-4 h-4 text-rose-400"></i>
+    <span id="toastMessage">コピーしました</span>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-slate-900 border-t-2 border-rose-900 py-5 mt-8 text-slate-400 text-xs">
+    <div class="max-w-6xl mx-auto px-4 text-center space-y-1.5">
+      <p class="font-black text-rose-300 text-sm tracking-wide">【社外秘・CONFIDENTIAL】本ツールは医療関係者向け参考資料です。</p>
+      <p class="text-slate-500">無断複写・転載を固く禁じます。計算結果は参考値であり、実際の処方は医師の判断に委ねられます。</p>
+    </div>
+  </footer>
+
+  <!-- Logic JavaScript -->
+  <script>
+    // Official Drug Prices
+    const GENERIC_DRUG_PRICE_PER_GRAM = 33.0; // メトロニダゾールゲル0.75%「マルイシ」 (33.0円/g)
+    const BRAND_DRUG_PRICE_PER_GRAM = 62.0;   // ロゼックスゲル0.75% (62.0円/g)
+
+    window.addEventListener('DOMContentLoaded', () => {
+      initIcons();
+      updateCalcMode();
+      calculate();
+    });
+
+    function initIcons() {
+      if (window.lucide) {
+        lucide.createIcons();
+      }
+    }
+
+    let currentCalcMode = 'rect'; // 'rect', 'ellipse', 'area'
+
+    function updateCalcMode() {
+      const modes = document.getElementsByName('calcMode');
+      for (const m of modes) {
+        if (m.checked) currentCalcMode = m.value;
+      }
+
+      // Update Label Highlights for Dark Theme
+      document.getElementById('modeLabelRect').className = currentCalcMode === 'rect' 
+        ? "cursor-pointer border-2 border-rose-500 bg-rose-950/40 rounded-xl p-2.5 text-center transition-all flex flex-col items-center gap-1 text-white font-bold shadow-sm"
+        : "cursor-pointer border border-slate-800 bg-slate-950/60 rounded-xl p-2.5 text-center transition-all flex flex-col items-center gap-1 hover:border-slate-700 text-slate-400";
+      
+      document.getElementById('modeLabelEllipse').className = currentCalcMode === 'ellipse' 
+        ? "cursor-pointer border-2 border-rose-500 bg-rose-950/40 rounded-xl p-2.5 text-center transition-all flex flex-col items-center gap-1 text-white font-bold shadow-sm"
+        : "cursor-pointer border border-slate-800 bg-slate-950/60 rounded-xl p-2.5 text-center transition-all flex flex-col items-center gap-1 hover:border-slate-700 text-slate-400";
+
+      document.getElementById('modeLabelArea').className = currentCalcMode === 'area' 
+        ? "cursor-pointer border-2 border-rose-500 bg-rose-950/40 rounded-xl p-2.5 text-center transition-all flex flex-col items-center gap-1 text-white font-bold shadow-sm"
+        : "cursor-pointer border border-slate-800 bg-slate-950/60 rounded-xl p-2.5 text-center transition-all flex flex-col items-center gap-1 hover:border-slate-700 text-slate-400";
+
+      const dimInputs = document.getElementById('dimensionInputs');
+      const areaContainer = document.getElementById('areaContainer');
+
+      if (currentCalcMode === 'area') {
+        dimInputs.classList.add('hidden');
+        areaContainer.classList.remove('hidden');
+      } else {
+        dimInputs.classList.remove('hidden');
+        areaContainer.classList.add('hidden');
+      }
+
+      calculate();
+    }
+
+    function setPresetSize(len, wid) {
+      if (currentCalcMode === 'area') {
+        document.getElementById('inputAreaDirect').value = len * wid;
+      } else {
+        document.getElementById('inputLength').value = len;
+        document.getElementById('inputWidth').value = wid;
+      }
+      calculate();
+    }
+
+    function setDays(days) {
+      document.getElementById('inputDays').value = days;
+      calculate();
+    }
+
+    function toggleAdvanced() {
+      const panel = document.getElementById('advancedPanel');
+      const chevron = document.getElementById('advChevron');
+      if (panel.classList.contains('hidden')) {
+        panel.classList.remove('hidden');
+        chevron.style.transform = 'rotate(180deg)';
+      } else {
+        panel.classList.add('hidden');
+        chevron.style.transform = 'rotate(0deg)';
+      }
+    }
+
+    // Main Calculation Routine
+    function calculate() {
+      const len = parseFloat(document.getElementById('inputLength').value) || 0;
+      const wid = parseFloat(document.getElementById('inputWidth').value) || 0;
+      const areaDirect = parseFloat(document.getElementById('inputAreaDirect').value) || 0;
+      const freq = parseInt(document.getElementById('inputFrequency').value) || 1;
+      const days = parseInt(document.getElementById('inputDays').value) || 1;
+      const density = parseFloat(document.getElementById('inputDensity').value) || 0.05;
+
+      let area = 0;
+      if (currentCalcMode === 'rect') {
+        area = len * wid;
+      } else if (currentCalcMode === 'ellipse') {
+        area = Math.PI * (len / 2) * (wid / 2);
+      } else {
+        area = areaDirect;
+      }
+
+      // Display Area Rounded to 1 decimal
+      document.getElementById('calcAreaDisplay').innerText = area.toFixed(1);
+
+      // Render Visual Canvas with Dark Aesthetics
+      drawCanvas(len, wid, currentCalcMode, area);
+
+      // Dose Calculation based on selected density
+      const singleDose = area * density;
+      const dailyDose = singleDose * freq;
+      const totalDose = dailyDose * days;
+
+      // Update UI Outputs
+      document.getElementById('resSingleDose').innerText = singleDose.toFixed(1);
+      document.getElementById('resDailyDose').innerText = dailyDose.toFixed(1);
+      document.getElementById('resTotalDose').innerText = totalDose.toFixed(1);
+      document.getElementById('resDaysLabel').innerText = days;
+
+      // Tube Breakdown
+      renderTubeRecommendation(totalDose);
+
+      // Price Estimation
+      calculatePrice(totalDose);
+    }
+
+    // Tube Calculation Logic for 50g, 100g, and Combination
+    function renderTubeRecommendation(totalGrams) {
+      const container = document.getElementById('tubeResultContainer');
+
+      // 1. 50g tube only
+      const tubes50Only = Math.ceil(totalGrams / 50) || (totalGrams > 0 ? 1 : 0);
+      const total50Only = tubes50Only * 50;
+      const surplus50Only = total50Only - totalGrams;
+
+      // 2. 100g tube only
+      const tubes100Only = Math.ceil(totalGrams / 100) || (totalGrams > 0 ? 1 : 0);
+      const total100Only = tubes100Only * 100;
+      const surplus100Only = total100Only - totalGrams;
+
+      // 3. Combination (100g + 50g)
+      let opt100 = Math.floor(totalGrams / 100);
+      let remainder = totalGrams % 100;
+      let opt50 = 0;
+
+      if (remainder > 0) {
+        if (remainder <= 50) {
+          opt50 = 1;
+        } else {
+          opt100 += 1;
+        }
+      }
+      if (opt100 === 0 && opt50 === 0 && totalGrams > 0) {
+        opt50 = 1;
+      }
+      const totalOpt = (opt100 * 100) + (opt50 * 50);
+      const surplusOpt = totalOpt - totalGrams;
+
+      // Update Screen HTML
+      container.innerHTML = `
+        <!-- 50g Tube Only -->
+        <div class="bg-slate-950/90 rounded-xl p-3 border border-slate-800 flex justify-between items-center shadow-sm">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-bold text-slate-300">50gチューブのみ:</span>
+              <span class="text-sm font-extrabold text-rose-400">${tubes50Only}本</span>
+            </div>
+            <div class="text-[10px] text-slate-500 mt-0.5">総量 ${total50Only}g （余剰: ${surplus50Only.toFixed(1)}g）</div>
+          </div>
+          <span class="bg-rose-950/60 border border-rose-800/80 text-rose-300 text-[10px] font-bold px-2 py-0.5 rounded-full">50g規格</span>
+        </div>
+
+        <!-- 100g Tube Only -->
+        <div class="bg-slate-950/90 rounded-xl p-3 border border-slate-800 flex justify-between items-center shadow-sm">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-bold text-slate-300">100gチューブのみ:</span>
+              <span class="text-sm font-extrabold text-rose-400">${tubes100Only}本</span>
+            </div>
+            <div class="text-[10px] text-slate-500 mt-0.5">総量 ${total100Only}g （余剰: ${surplus100Only.toFixed(1)}g）</div>
+          </div>
+          <span class="bg-rose-950/80 border border-rose-700 text-rose-200 text-[10px] font-bold px-2 py-0.5 rounded-full">100g規格</span>
+        </div>
+
+        <!-- Combination -->
+        <div class="bg-gradient-to-r from-rose-950/60 to-slate-900/90 rounded-xl p-3 border border-rose-800/70 flex justify-between items-center shadow-md">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-bold text-rose-300">組み合わせ（余剰最小）:</span>
+            </div>
+            <div class="text-xs font-extrabold text-white mt-0.5">
+              ${opt100 > 0 ? `100g × ${opt100}本` : ''} ${opt100 > 0 && opt50 > 0 ? '＋ ' : ''}${opt50 > 0 ? `50g × ${opt50}本` : ''}
+            </div>
+            <div class="text-[10px] text-slate-400 mt-0.5">総量 ${totalOpt}g （余剰: ${surplusOpt.toFixed(1)}g）</div>
+          </div>
+        </div>
+      `;
+      
+      initIcons();
+    }
+
+    function calculatePrice(totalGrams) {
+      const burden = parseFloat(document.getElementById('inputBurden').value) || 0.3;
+      
+      const genericTotalCost = totalGrams * GENERIC_DRUG_PRICE_PER_GRAM;
+      const genericPatientCost = Math.round(genericTotalCost * burden);
+
+      const brandTotalCost = totalGrams * BRAND_DRUG_PRICE_PER_GRAM;
+      const brandPatientCost = Math.round(brandTotalCost * burden);
+
+      const costDiff = brandPatientCost - genericPatientCost;
+
+      document.getElementById('resBurdenRate').innerText = Math.round(burden * 10);
+      document.getElementById('resPriceGeneric').innerText = `約 ${genericPatientCost.toLocaleString()} 円`;
+      document.getElementById('resPriceBrand').innerText = `約 ${brandPatientCost.toLocaleString()} 円`;
+      document.getElementById('resPriceDiff').innerText = `- ${costDiff.toLocaleString()} 円`;
+    }
+
+    // Canvas Drawing Function tailored for Dark Theme
+    function drawCanvas(len, wid, mode, area) {
+      const canvas = document.getElementById('ulcerCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const displayLen = mode === 'area' ? Math.sqrt(area) : len;
+      const displayWid = mode === 'area' ? Math.sqrt(area) : wid;
+
+      const maxDim = Math.max(displayLen, displayWid, 1);
+      const scale = Math.min((canvas.width - 30) / maxDim, (canvas.height - 30) / maxDim, 12);
+      const w = Math.max(displayWid * scale, 15);
+      const h = Math.max(displayLen * scale, 15);
+      const x = (canvas.width - w) / 2;
+      const y = (canvas.height - h) / 2;
+
+      // Dark theme colors
+      ctx.fillStyle = 'rgba(244, 63, 94, 0.15)'; // Deep subtle pink
+      ctx.strokeStyle = '#f43f5e'; // Bright Rose Neon
+      ctx.lineWidth = 2;
+
+      if (mode === 'ellipse') {
+        ctx.beginPath();
+        ctx.ellipse(canvas.width / 2, canvas.height / 2, w / 2, h / 2, 0, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.stroke();
+      } else {
+        ctx.beginPath();
+        if (ctx.roundRect) {
+          ctx.roundRect(x, y, w, h, 6);
+        } else {
+          ctx.rect(x, y, w, h);
+        }
+        ctx.fill();
+        ctx.stroke();
+      }
+
+      ctx.fillStyle = '#fda4af';
+      ctx.font = 'bold 11px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      if (mode === 'area') {
+        ctx.fillText(`${area.toFixed(1)} cm²`, canvas.width / 2, canvas.height / 2);
+      } else {
+        ctx.fillText(`${displayLen}cm × ${displayWid}cm`, canvas.width / 2, canvas.height / 2);
+      }
+    }
+
+    // Copy Summary Function (Updated label to 差額)
+    function copySummary() {
+      const single = document.getElementById('resSingleDose').innerText;
+      const daily = document.getElementById('resDailyDose').innerText;
+      const total = document.getElementById('resTotalDose').innerText;
+      const days = document.getElementById('resDaysLabel').innerText;
+      const burdenRate = document.getElementById('resBurdenRate').innerText;
+      const density = document.getElementById('inputDensity').value;
+
+      const genericPrice = document.getElementById('resPriceGeneric').innerText;
+      const brandPrice = document.getElementById('resPriceBrand').innerText;
+      const priceDiff = document.getElementById('resPriceDiff').innerText;
+
+      const totalGrams = parseFloat(total) || 0;
+      const tubes50Only = Math.ceil(totalGrams / 50) || (totalGrams > 0 ? 1 : 0);
+      const tubes100Only = Math.ceil(totalGrams / 100) || (totalGrams > 0 ? 1 : 0);
+
+      let opt100 = Math.floor(totalGrams / 100);
+      let remainder = totalGrams % 100;
+      let opt50 = 0;
+      if (remainder > 0) {
+        if (remainder <= 50) opt50 = 1;
+        else opt100 += 1;
+      }
+      if (opt100 === 0 && opt50 === 0 && totalGrams > 0) opt50 = 1;
+
+      const text = `【メトロニダゾールゲル0.75%「マルイシ」 投与量・薬剤費比較サマリー（社外秘 / CONFIDENTIAL）】\n` +
+                   `1回塗布量: ${single} g\n` +
+                   `1日塗布量: ${daily} g\n` +
+                   `必要総量 (${days}日分): ${total} g\n` +
+                   `--------------------------------\n` +
+                   `【推奨処方本数】\n` +
+                   `・50g規格のみ: ${tubes50Only}本\n` +
+                   `・100g規格のみ: ${tubes100Only}本\n` +
+                   `・組み合わせ: ${opt100 > 0 ? `100g×${opt100}本 ` : ''}${opt50 > 0 ? `50g×${opt50}本` : ''}\n` +
+                   `--------------------------------\n` +
+                   `【薬剤費（自己負担 ${burdenRate}割 概算）】\n` +
+                   `・先発品: ${brandPrice}\n` +
+                   `・後発品（メトロニダゾールゲル「マルイシ」）: ${genericPrice}\n` +
+                   `★ 後発品変更による差額: ${priceDiff}\n` +
+                   `（※塗布密度 ${density}g/cm² 換算 / 薬剤本体のみの計算です）`;
+
+      const dummy = document.createElement("textarea");
+      document.body.appendChild(dummy);
+      dummy.value = text;
+      dummy.select();
+      document.execCommand("copy");
+      document.body.removeChild(dummy);
+
+      showToast("計算結果と薬剤費比較をコピーしました");
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toastMessage').innerText = msg;
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      setTimeout(() => {
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 3000);
+    }
+  </script>
+</body>
+</html>
